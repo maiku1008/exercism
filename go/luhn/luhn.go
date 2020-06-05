@@ -16,10 +16,8 @@ func Valid(input string) bool {
 		return false
 	}
 
-	var (
-		even = len(input)%2 == 0
-		sum  int
-	)
+	var even = len(input)%2 == 0
+	var sum int
 
 	for _, v := range input {
 		// Convert string value to int.
