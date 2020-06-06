@@ -2,17 +2,16 @@ package tree
 
 import (
 	"errors"
-	"fmt"
 	"sort"
 )
 
-// Record contains information about a possible node
+// Record contains information about a node
 type Record struct {
 	ID     int
 	Parent int
 }
 
-// Node represents a node in our tree
+// Node represents a node in the tree
 type Node struct {
 	ID       int
 	Children []*Node
@@ -30,66 +29,26 @@ func Build(records []Record) (*Node, error) {
 		return records[i].ID < records[j].ID
 	})
 
-	var root *Node
-	for _, record := range records {
-		// Set Root node
-		if record.ID == 0 {
-			switch {
-			case root != nil:
-				return nil, errors.New("root node exists and cannot be duplicated")
-			case record.ID == 0 && record.Parent != 0:
-				return nil, errors.New("node with id 0 has parent")
-			case record.ID == 0 && record.Parent == 0:
-				root = &Node{
-					ID: record.ID,
-				}
-			}
-			continue
+	nodes := make([]*Node, len(records))
+	for i, record := range records {
+		switch {
+		case i != record.ID:
+			return nil, errors.New("record ids are not contiguous")
+		case record.Parent > record.ID:
+			return nil, errors.New("parent id is bigger than child id")
+		case record.ID > 0 && record.Parent == record.ID:
+			return nil, errors.New("child cannot be its own parent")
 		}
 
-		// Check the record's parent, and match it with the right node.
-		parent, err := findNodeByID(record.Parent, root)
-		if err != nil {
-			return nil, err
-		}
-		// We need to append the ID of the record to the correct parent node (record.Parent)
-		err = adoptChild(parent, &Node{ID: record.ID})
-		if err != nil {
-			return nil, err
-		}
-	}
-	return root, nil
-}
+		// Create the node and store it using the index number as its id
+		node := &Node{ID: record.ID}
+		nodes[i] = node
 
-// A helper function that adopts a child if it's not there already
-func adoptChild(parent, child *Node) error {
-	for _, member := range parent.Children {
-		if member.ID == child.ID {
-			return fmt.Errorf("duplicate child: %d", child.ID)
+		// Adopt the child
+		if record.ID > 0 {
+			parent := nodes[record.Parent]
+			parent.Children = append(parent.Children, nodes[record.ID])
 		}
 	}
-	parent.Children = append(parent.Children, child)
-
-	return nil
-}
-
-// findNodeByID looks for a node with the id
-func findNodeByID(id int, start *Node) (*Node, error) {
-	if start == nil {
-		return nil, errors.New("starting node is nil")
-	}
-
-	// Found
-	if id == start.ID {
-		return start, nil
-	}
-
-	for _, node := range start.Children {
-		// Found
-		if node.ID == id {
-			return node, nil
-		}
-	}
-
-	return nil, fmt.Errorf("could not find node with id: %d ", id)
+	return nodes[0], nil
 }
