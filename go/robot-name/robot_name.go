@@ -2,25 +2,22 @@ package robotname
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
-	"strconv"
 	"time"
-	"sync"
 )
 
-const (
-	chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	max = 26*26*10*10*10
-)
+const max = 26 * 26 * 10 * 10 * 10
 
 var used = map[string]bool{}
 
+// Robot defines a robot with a name
 type Robot struct {
 	name string
 }
 
+// Name generates a new name for the robot
 func (r *Robot) Name() (string, error) {
-
 	if r.name != "" {
 		return r.name, nil
 	}
@@ -30,34 +27,16 @@ func (r *Robot) Name() (string, error) {
 		return "", errors.New("used up all possible names")
 	}
 
-	var mu sync.RWMutex
-	resCh := make(chan string, 10)
-
-	var ok bool
-	for !ok {
-
-		// fmt.Println("looped: ", n) // Debugging
-		go func() {
-			n := generate()
-			mu.Lock()
-			if !used[n] {
-				used[n] = true
-				resCh <- n
-			}
-			mu.Unlock()
-		}()
+	r.name = generate()
+	for used[r.name] {
+		r.name = generate()
 	}
+	used[r.name] = true
 
-	for n := range resCh {
-		mu.Lock()
-		mu.Unlock()
-	}
-
-
-	r.name = n
 	return r.name, nil
 }
 
+// Reset wipes the name from the robot's memory
 func (r *Robot) Reset() {
 	r.name = ""
 }
@@ -65,14 +44,12 @@ func (r *Robot) Reset() {
 // Helper function to generate a random robot name
 // in the form AA###
 func generate() string {
-	rand.Seed(time.Now().UnixNano())
+	r1 := rand.Intn(26) + 'A'
+	r2 := rand.Intn(26) + 'A'
+	num := rand.Intn(1000)
+	return fmt.Sprintf("%c%c%03d", r1, r2, num)
+}
 
-	var name string
-	for i := 0; i < 2; i++ {
-		name += string(chars[rand.Intn(len(chars))])
-	}
-	for i := 0; i < 3; i++ {
-		name += strconv.Itoa(rand.Intn(9))
-	}
-	return name
+func init() {
+	rand.Seed(time.Now().UnixNano())
 }
