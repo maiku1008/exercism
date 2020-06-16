@@ -2,3 +2,7 @@
 users/
 .exercism
 .idea
+
+.eslintrc
+.npmrc
+node_modules/

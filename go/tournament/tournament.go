@@ -66,11 +66,9 @@ func Tally(r io.Reader, w io.Writer) error {
 	}
 
 	// Extract the standings into a slice
-	tally := make([]standings, len(tallyMap))
-	i := 0
+	tally := make([]standings, 0, len(tallyMap))
 	for _, v := range tallyMap {
-		tally[i] = v
-		i++
+		tally = append(tally, v)
 	}
 	// Sort
 	sort.Slice(tally, func(i, j int) bool {
@@ -80,15 +78,14 @@ func Tally(r io.Reader, w io.Writer) error {
 		return tally[i].points > tally[j].points
 	})
 	// Format string and send it to writer
-	_, err = fmt.Fprint(w, "Team                           | MP |  W |  D |  L |  P\n")
+	_, err = fmt.Fprintf(w, "%-31s| MP |  W |  D |  L |  P\n", "Team")
 	if err != nil {
 		return err
 	}
-	var table = "|  %d |  %d |  %d |  %d |  %d\n"
 	for _, res := range tally {
 		_, err = fmt.Fprintf(
-			w, res.team+strings.Repeat(" ", 31-len(res.team))+table,
-			res.played, res.won, res.draw, res.lost, res.points,
+			w, "%-31s|  %d |  %d |  %d |  %d |  %d\n",
+			res.team, res.played, res.won, res.draw, res.lost, res.points,
 		)
 		if err != nil {
 			return err
