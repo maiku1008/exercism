@@ -1,10 +1,14 @@
 from collections import Counter
-from string import punctuation
 
-
-def clean(sentence):
-    return [w.strip(punctuation) for w in sentence.lower().split()]
-
+# Custom punctuation string without single quote '
+punctuation = r"""!"#$%&()*+,-./:;<=>?@[\]^_`{|}~"""
 
 def count_words(sentence):
-    return dict(Counter(clean(sentence)))
+    # Translate anything found in constant punctuation into whitespace
+    table = str.maketrans({k: " " for k in punctuation})
+    sentence = sentence.translate(table)
+
+    # Strip single quotes surrounding words
+    s = [w.strip("'") for w in sentence.lower().split()]
+
+    return dict(Counter(s))
