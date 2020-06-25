@@ -33,11 +33,10 @@ func tryToOpen(n int, o ResourceOpener) (Resource, error) {
 			break
 		}
 
-		_, te := err.(TransientError)
-		switch te {
-		case true:
+		switch err.(type) {
+		case TransientError:
 			continue
-		case false:
+		default:
 			return nil, err
 		}
 	}
