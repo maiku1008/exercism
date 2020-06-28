@@ -1,50 +1,20 @@
 package erratum
 
-const attempts = 5
+import "log"
 
 // Use tries its best to frob a resource
-func Use(o ResourceOpener, input string) error {
-	r, err := tryToOpen(attempts, o)
-	if err != nil {
-		return err
+func Use(o ResourceOpener, input string) (err error) {
+	var r Resource
+
+	r, err = o()
+	for err != nil {
+		if _, ok := err.(TransientError); !ok {
+			return err
+		}
+		r, err = o()
 	}
 	defer r.Close()
 
-	err = tryToFrob(r, input)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// helper function that attempts to open a resource n times,
-// crashing and burning in the process
-func tryToOpen(n int, o ResourceOpener) (Resource, error) {
-	var r Resource
-	var err error
-
-	for i := 0; ; i++ {
-		r, err = o()
-		if err == nil {
-			return r, nil
-		}
-
-		if i >= (n - 1) {
-			break
-		}
-
-		switch err.(type) {
-		case TransientError:
-			continue
-		default:
-			return nil, err
-		}
-	}
-	return nil, err
-}
-
-// a helper function which attempts to frob a frobbable resource
-func tryToFrob(r Resource, input string) (err error) {
 	defer func() {
 		if rec := recover(); rec != nil {
 			switch rec.(type) {
@@ -55,6 +25,8 @@ func tryToFrob(r Resource, input string) (err error) {
 			case error:
 				r.Close()
 				err = rec.(error)
+			default:
+				log.Fatal(rec)
 			}
 		}
 	}()
