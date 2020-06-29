@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+// Matrix is our matrix object
+type Matrix struct {
+	rows [][]int
+}
+
 // New takes an input string and uses it to initialize a matrix
 func New(input string) (*Matrix, error) {
 	split := strings.Split(input, "\n")
@@ -33,11 +38,6 @@ func New(input string) (*Matrix, error) {
 		}
 	}
 	return m, nil
-}
-
-// Matrix is our matrix object
-type Matrix struct {
-	rows [][]int
 }
 
 // Rows returns a copy of the rows field of m

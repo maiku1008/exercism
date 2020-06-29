@@ -1,7 +1,5 @@
 package erratum
 
-import "log"
-
 // Use tries its best to frob a resource
 func Use(o ResourceOpener, input string) (err error) {
 	var r Resource
@@ -17,17 +15,10 @@ func Use(o ResourceOpener, input string) (err error) {
 
 	defer func() {
 		if rec := recover(); rec != nil {
-			switch rec.(type) {
-			case FrobError:
-				r.Defrob(rec.(FrobError).defrobTag)
-				r.Close()
-				err = rec.(FrobError)
-			case error:
-				r.Close()
-				err = rec.(error)
-			default:
-				log.Fatal(rec)
+			if frob, ok := rec.(FrobError); ok {
+				r.Defrob(frob.defrobTag)
 			}
+			err = rec.(error)
 		}
 	}()
 	r.Frob(input)

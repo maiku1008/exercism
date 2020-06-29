@@ -11,7 +11,12 @@ var testCases = []struct {
 }{
 	{
 		"single digit strings can not be valid",
-		"1",
+		"4539 1488 0343 6467",
+		true,
+	},
+	{
+		"single digit strings can not be valid",
+		"4539 1488 0343 646",
 		false,
 	},
 	{
