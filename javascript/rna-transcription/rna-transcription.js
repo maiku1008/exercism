@@ -1,8 +1,13 @@
-//
-// This is only a SKELETON file for the 'RNA Transcription' exercise. It's been provided as a
-// convenience to get you started writing code faster.
-//
+const COMPLEMENTS = [['G', 'C'], ['C', 'G'], ['T', 'A'], ['A', 'U']]
 
-export const toRna = () => {
-  throw new Error("Remove this statement and implement this function");
+export const toRna = (dna_string) => {
+    let rna_string = ""
+    let m = new Map(COMPLEMENTS);
+    for (let c of dna_string) {
+        c = m.get(c);
+        if (c !== undefined) {
+            rna_string += c;
+        }
+    }
+    return rna_string
 };
