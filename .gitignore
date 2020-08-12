@@ -6,8 +6,5 @@ users/
 .eslintrc
 .npmrc
 node_modules/
-package.json
-package-lock.json
-babel.config.js
 __pycache__/
 .python-version
