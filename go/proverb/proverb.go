@@ -1,26 +1,16 @@
 package proverb
 
-// Proverb should have a comment documenting it.
+import "fmt"
+
+// Proverb returns a proverb made out of rhymes
 func Proverb(rhyme []string) []string {
-
-	var sentences []string
-	// if len(rhyme) == 0 {
-	// 	return sentences
-	// }
-
-	var lastSentence string
-	if (len(rhyme) > 0 ) {
-		lastSentence = "And all for the want of a " + rhyme[len(rhyme)-1] + "."
-	}
-
-	if (len(rhyme) == 1 ) {
-		sentences = append(sentences, lastSentence)
-	} else {
-		for i , word := range rhyme {
-			sentences = append(sentences, "For want of a " + word + " the " + rhyme[i+1] + " was lost.")
+	proverb := make([]string, len(rhyme))
+	for i, v := range rhyme {
+		if i != len(rhyme)-1 {
+			proverb[i] = fmt.Sprintf("For want of a %s the %s was lost.", v, rhyme[i+1])
+			continue
 		}
-		sentences = append(sentences, lastSentence)
+		proverb[i] = fmt.Sprintf("And all for the want of a %s.", rhyme[0])
 	}
-
-	return sentences
+	return proverb
 }
