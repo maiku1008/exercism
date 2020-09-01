@@ -1,13 +1,5 @@
-const COMPLEMENTS = [['G', 'C'], ['C', 'G'], ['T', 'A'], ['A', 'U']]
+const COMPLEMENTS = {C: 'G', G: 'C', A:'U', T: 'A'};
 
 export const toRna = (dna_string) => {
-    let rna_string = ""
-    let m = new Map(COMPLEMENTS);
-    for (let c of dna_string) {
-        c = m.get(c);
-        if (c !== undefined) {
-            rna_string += c;
-        }
-    }
-    return rna_string
+    return dna_string.split('').map(i => COMPLEMENTS[i]).join('')
 };
