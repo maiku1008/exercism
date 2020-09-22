@@ -1,5 +1,5 @@
-const EARTH_SECONDS_IN_YEAR = 31557600
-const PLANETARY_TIME = {
+const EARTH_SECONDS_IN_YEAR = 315576 * Math.pow(10, 2);
+const EARTH_YEARS_ON_PLANET = {
   mercury: 0.2408467,
   venus: 0.61519726,
   earth: 1.0,
@@ -11,5 +11,11 @@ const PLANETARY_TIME = {
 }
 
 export const age = (planet, seconds) => {
-  return Number((seconds / EARTH_SECONDS_IN_YEAR / PLANETARY_TIME[planet]).toFixed(2))
+  return round(seconds / EARTH_SECONDS_IN_YEAR / EARTH_YEARS_ON_PLANET[planet], 2)
+}
+
+const round = (value, decimals) => {
+  const precision = Math.pow(10, decimals);
+  const epsilon = Number.EPSILON;
+  return Math.round((value + epsilon) * precision) / precision;
 }
