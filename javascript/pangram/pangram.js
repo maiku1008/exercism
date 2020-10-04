@@ -1,7 +1,5 @@
-const ALPHABET = new Set("abcdefghijklmnopqrstuvwxyz")
-
+const ALPHABET = [..."abcdefghijklmnopqrstuvwxyz"]
 
 export const isPangram = (sentence) => {
-    const sentence_letters = new Set(sentence.toLowerCase().replace(/[^a-z]/g, ''))
-    return ALPHABET.size === sentence_letters.size
-};
+  return ALPHABET.every((character) => sentence.toLowerCase().includes(character))
+}
