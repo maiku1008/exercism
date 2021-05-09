@@ -2,7 +2,6 @@ package queenattack
 
 import (
 	"errors"
-	"fmt"
 )
 
 const width = 8
@@ -22,23 +21,17 @@ func CanQueenAttack(white, black string) (bool, error) {
 	w.setRank()
 	w.setDiagonal()
 
-	// only set initial position for black
+	// Only set the initial position for black
 	b, err := newQueen(black)
 	if err != nil {
 		return false, err
 	}
 
-	// If any of the attack positions of white match with black's position,
-	// queens can attack each other
-	if w.position&b.position != 0 {
+	// If any of the square of white match with black's position,
+	// it means the queens can attack each other
+	if w.board&b.board != 0 {
 		return true, nil
 	}
-	// Print the boards for debugging purposes
-	w.print()
-	fmt.Println()
-	b.print()
-	// n, _ := newQueen("a1")
-	// n.print()
 	return false, nil
 }
 
@@ -63,9 +56,9 @@ func newQueen(position string) (*queen, error) {
 }
 
 type queen struct {
-	position uint64
-	rank     int
-	file     int
+	board uint64
+	rank  int
+	file  int
 }
 
 func (b *queen) setPosition(file, rank int) {
@@ -74,7 +67,7 @@ func (b *queen) setPosition(file, rank int) {
 }
 
 func (b *queen) setBit(pos int) {
-	b.position |= (1 << pos)
+	b.board |= (1 << pos)
 }
 
 func (b *queen) setFile() {
@@ -90,28 +83,14 @@ func (b *queen) setRank() {
 }
 
 func (b *queen) setDiagonal() {
-	diagonal := b.rank - b.file + 7
-	antidiagonal := b.rank + b.file
-	for i := 0; i < width; i++ {
-		for j := 0; j < width; j++ {
-			diag := i - j + 7
-			antid := j + i
-			if diag == diagonal || antid == antidiagonal {
-				b.setPosition(i, j)
+	for x := 0; x < width; x++ {
+		for y := 0; y < width; y++ {
+			if b.file-b.rank == x-y {
+				b.setPosition(x, y)
+			}
+			if b.file+b.rank == x+y {
+				b.setPosition(x, y)
 			}
 		}
 	}
-}
-
-func (b *queen) print() {
-	board := fmt.Sprintf("%064b", b.position)
-	result := string(board[0])
-	for i := 1; i < width*width; i++ {
-		if i%width == 0 {
-			result += "\n"
-		}
-		result += string(board[i])
-	}
-	fmt.Println(result)
-	fmt.Println()
 }
