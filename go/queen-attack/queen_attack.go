@@ -12,84 +12,71 @@ func CanQueenAttack(white, black string) (bool, error) {
 	if white == black {
 		return false, errors.New("positions for white and black are the same")
 	}
-	w, err := newQueen(white)
+	setAttackSquares := true
+	w, err := newBoard(white, setAttackSquares)
 	if err != nil {
 		return false, err
 	}
-	// Fill the board with possible attack positions from white
-	w.setFile()
-	w.setRank()
-	w.setDiagonal()
-
-	// Only set the initial position for black
-	b, err := newQueen(black)
+	b, err := newBoard(black, !setAttackSquares)
 	if err != nil {
 		return false, err
 	}
-
-	// If any of the square of white match with black's position,
-	// it means the queens can attack each other
-	if w.board&b.board != 0 {
+	if w&b != 0 {
 		return true, nil
 	}
 	return false, nil
 }
 
-func newQueen(position string) (*queen, error) {
+func newBoard(position string, setAttackSquares bool) (bitboard, error) {
 	if !(len(position) == 2) {
-		return nil, errors.New("invalid square")
+		return 0, errors.New("invalid square")
 	}
 	file, rank := position[0], position[1]
 	if file < 'a' || file > 'h' {
-		return nil, errors.New("square out of bounds")
+		return 0, errors.New("square out of bounds")
 	}
 	if rank < '1' || rank > '8' {
-		return nil, errors.New("square out of bounds")
+		return 0, errors.New("square out of bounds")
 	}
-	q := &queen{
-		file: int(file - 'a'),
-		rank: int(rank - '1'),
-	}
-	q.setPosition(q.file, q.rank)
+	x, y := int(file-'a'), int(rank-'1')
 
+	var q bitboard
+	q.setBit(x + (y * width))
+
+	if setAttackSquares {
+		q.setFile(x, y)
+		q.setRank(x, y)
+		q.setDiagonal(x, y)
+	}
 	return q, nil
 }
 
-type queen struct {
-	board uint64
-	rank  int
-	file  int
+type bitboard uint64
+
+func (b *bitboard) setBit(pos int) {
+	*b |= (1 << pos)
 }
 
-func (b *queen) setPosition(file, rank int) {
-	bit := file + (rank * width)
-	b.setBit(bit)
-}
-
-func (b *queen) setBit(pos int) {
-	b.board |= (1 << pos)
-}
-
-func (b *queen) setFile() {
+func (b *bitboard) setFile(file, rank int) {
 	for i := 0; i < width; i++ {
-		b.setBit(i + (b.rank * width))
+		b.setBit(i + (rank * width))
 	}
 }
 
-func (b *queen) setRank() {
+func (b *bitboard) setRank(file, rank int) {
 	for i := 0; i < width; i++ {
-		b.setBit(b.file + (i * width))
+		b.setBit(file + (i * width))
 	}
 }
 
-func (b *queen) setDiagonal() {
+func (b *bitboard) setDiagonal(file, rank int) {
 	for x := 0; x < width; x++ {
 		for y := 0; y < width; y++ {
-			if b.file-b.rank == x-y {
-				b.setPosition(x, y)
+			if file-rank == x-y {
+				b.setBit(x + (y * width))
 			}
-			if b.file+b.rank == x+y {
-				b.setPosition(x, y)
+			if file+rank == x+y {
+				b.setBit(x + (y * width))
 			}
 		}
 	}
