@@ -5,9 +5,9 @@ int color_code(resistor_band_t color)
     return color;
 }
 
-int * colors(void)
+const resistor_band_t * colors(void)
 {
-    static int r[10];
+    static resistor_band_t r[10];
     for (int i = BLACK; i <= WHITE; i++)
     {
         r[i] = i;
