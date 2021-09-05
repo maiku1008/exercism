@@ -7,8 +7,7 @@ scores_list = [
     ("J,X", 8),
     ("Q,Z", 10),
 ]
-
+scores = {char: score[1] for score in scores_list for char in score[0].split(",")}
 
 def score(word):
-    scores = {char: score[1] for score in scores_list for char in score[0].split(",")}
     return sum((scores[letter.upper()] for letter in word))

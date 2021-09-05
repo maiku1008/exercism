@@ -1,3 +1,3 @@
 # Exercism
 
-Solutions to [exercism](https://exercism.io) v2 problems
+Solutions to [exercism](https://exercism.io) problems
